@@ -18,11 +18,15 @@ public class MobController : MonoBehaviour
         Laserbullet
     }
 
+    public int _tactic = 1; //èÛãµîªï 
     public MobState _mobState;
     Transform _targetTransform;
     NavMeshAgent _navAgent;
     Vector3 _destination;
-
+    [SerializeField] Animator _animator;
+    [SerializeField] float _freezeTime = 0.2f;
+    float _freezeTimer = 0;
+     
     private void Start()
     {
         _navAgent = GetComponent<NavMeshAgent>();
@@ -46,10 +50,29 @@ public class MobController : MonoBehaviour
             dir.y = 0;
             Quaternion setRotation = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.Slerp(transform.rotation, setRotation, _navAgent.angularSpeed * 0.1f * Time.deltaTime);
+            _animator.SetBool("IsWalk", true);
         }
+        else if(_mobState == MobState.Slashattack)
+        {
+            _animator.SetBool("IsWalk", false);
+            _animator.SetBool("IsAttack", true);
+            AttackStop();
+        }
+        else if (_mobState == MobState.Freeze)
+        {
+            _freezeTimer += Time.deltaTime;
+            if(_freezeTimer > _freezeTime)
+            {
+                _freezeTimer = 0;
+                _mobState = MobState.Idle;
+            }
+        }
+
     }
     public void SetState(MobState tempState, Transform targetObject = null)
     {
+        if (_mobState == MobState.Freeze)
+            return;
         _mobState = tempState;
         if(tempState == MobState.Idle)
         {
@@ -76,4 +99,63 @@ public class MobController : MonoBehaviour
     {
         return _destination;
     }
+
+    public bool _attack = false;
+    public int _atCount = 1;
+    public void AttackStop()
+    {
+        _attack = false;
+        _animator.SetBool("IsAttack", false);
+        if (GetState() == MobState.Freeze) 
+            SetState(MobState.Chase);
+        else
+        {
+            float percent = 0.0f;
+
+            switch(_tactic)//òAë±çUåÇÇÃóêêî
+            {
+                case 1:
+                    percent = 100.0f;
+                    break;
+                case 2:
+                    if (_atCount == 1)
+                        percent = 50.0f;
+                    else if (_atCount == 2)
+                        percent = 100.0f;
+                    break;
+                case 3:
+                    if (_atCount == 1)
+                        percent = 30.0f;
+                    else if (_atCount == 2)
+                        percent = 70.0f;
+                    else if (_atCount == 3)
+                        percent = 100.0f;
+                    break;
+            }
+
+            //òAë±çUåÇÇÃï™äÚ
+            if(Probability(percent))
+            {
+                SetState(MobState.Freeze);
+                _atCount = 1;
+            }
+            else
+            {
+                SetState(MobState.Chase);
+                _atCount++;
+            }
+        }
+    }
+
+    public bool Probability(float percent)
+    {
+        float ProbabilityRate = Random.value * 100f;
+        if (percent == 100.0f && ProbabilityRate == percent)
+            return true;
+        else if (ProbabilityRate < percent)
+            return true;
+        else
+            return false;
+    }
+
 }

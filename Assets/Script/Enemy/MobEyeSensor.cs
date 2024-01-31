@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class EnemyEyeSensor : MonoBehaviour
+public class MobEyeSensor : MonoBehaviour
 {
     [SerializeField] SphereCollider _serchArea = default;
     [SerializeField] float _serchAngle = 45f;
@@ -13,7 +13,8 @@ public class EnemyEyeSensor : MonoBehaviour
 
     private void Start()
     {
-        mob = transform.parent.GetComponent<MobController>();
+       // mob = transform.parent.GetComponent<MobController>();
+       mob = GetComponent<MobController>();
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -26,25 +27,26 @@ public class EnemyEyeSensor : MonoBehaviour
             if(angle <= _serchAngle)
             {
                 _control.transform.position = Vector3.Lerp(_control.transform.position, other.gameObject.transform.position, 0.1f);
-                if(dis <= _serchAngle * 0.15f && dis >= _serchAngle * 0f)
+                if(dis <= _serchArea.radius * 0.15f && dis >= _serchArea.radius * 0f)
                 {
 
                 }
-                else if(dis <= _serchAngle * 0.8f && dis >= _serchAngle * 0.15f)
+                else if(dis <= _serchArea.radius * 0.8f && dis >= _serchArea.radius * 0.15f)
                 {
-
+                    mob.SetState(MobController.MobState.Chase, other.gameObject.transform);
                 }
-                else if(dis <= _serchAngle * 1f && dis >= _serchAngle * 0.8f)
+                else if(dis <= _serchArea.radius * 1f && dis >= _serchArea.radius * 0.8f)
                 {
-
+                    //èÛë‘ëJà⁄
+                    mob.SetState(MobController.MobState.Idle);
                 }
-                //èÛë‘ëJà⁄
-                mob.SetState(MobController.MobState.Chase, other.gameObject.transform);
+               
             }
             else
             {
                 _control.transform.position = Vector3.Lerp(_control.transform.position, transform.position, 0.1f);
                 mob.SetState(MobController.MobState.Idle);
+                Debug.Log("éÀíˆäO");
             }
         }
     }
@@ -60,7 +62,7 @@ public class EnemyEyeSensor : MonoBehaviour
         if(_editor)
         {
             Handles.color = Color.red;
-            Handles.DrawSolidArc(transform.position, Vector3.up, Quaternion.Euler(0f, -_serchAngle, 0f) * transform.forward, _serchAngle * 2f, _serchArea.radius * 0.5f);
+            Handles.DrawSolidArc(transform.position, Vector3.up, Quaternion.Euler(0f, -_serchAngle, 0f) * transform.forward, _serchAngle * 2f, _serchArea.radius);
         }
     }
 
