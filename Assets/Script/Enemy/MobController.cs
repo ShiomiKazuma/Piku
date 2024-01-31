@@ -24,7 +24,7 @@ public class MobController : MonoBehaviour
     NavMeshAgent _navAgent;
     Vector3 _destination;
     [SerializeField] Animator _animator;
-    [SerializeField] float _freezeTime = 0.2f;
+    [SerializeField] float _freezeTime = 3f;
     float _freezeTimer = 0;
      
     private void Start()
@@ -56,7 +56,7 @@ public class MobController : MonoBehaviour
         {
             _animator.SetBool("IsWalk", false);
             _animator.SetBool("IsAttack", true);
-            AttackStop();
+            Invoke(nameof(AttackStop), 1.0f);
         }
         else if (_mobState == MobState.Freeze)
         {
@@ -67,7 +67,7 @@ public class MobController : MonoBehaviour
                 _mobState = MobState.Idle;
             }
         }
-
+        Debug.Log(_freezeTimer);
     }
     public void SetState(MobState tempState, Transform targetObject = null)
     {
@@ -104,47 +104,49 @@ public class MobController : MonoBehaviour
     public int _atCount = 1;
     public void AttackStop()
     {
-        _attack = false;
         _animator.SetBool("IsAttack", false);
-        if (GetState() == MobState.Freeze) 
-            SetState(MobState.Chase);
-        else
-        {
-            float percent = 0.0f;
+        _mobState = MobState.Freeze;
+        //_attack = false;
+        //if (GetState() == MobState.Freeze) 
+        //    SetState(MobState.Chase);
+        //else
+        //{
+        //    float percent = 0.0f;
 
-            switch(_tactic)//òAë±çUåÇÇÃóêêî
-            {
-                case 1:
-                    percent = 100.0f;
-                    break;
-                case 2:
-                    if (_atCount == 1)
-                        percent = 50.0f;
-                    else if (_atCount == 2)
-                        percent = 100.0f;
-                    break;
-                case 3:
-                    if (_atCount == 1)
-                        percent = 30.0f;
-                    else if (_atCount == 2)
-                        percent = 70.0f;
-                    else if (_atCount == 3)
-                        percent = 100.0f;
-                    break;
-            }
+        //    switch(_tactic)//òAë±çUåÇÇÃóêêî
+        //    {
+        //        case 1:
+        //            percent = 100.0f;
+        //            break;
+        //        case 2:
+        //            if (_atCount == 1)
+        //                percent = 50.0f;
+        //            else if (_atCount == 2)
+        //                percent = 100.0f;
+        //            break;
+        //        case 3:
+        //            if (_atCount == 1)
+        //                percent = 30.0f;
+        //            else if (_atCount == 2)
+        //                percent = 70.0f;
+        //            else if (_atCount == 3)
+        //                percent = 100.0f;
+        //            break;
+        //    }
 
-            //òAë±çUåÇÇÃï™äÚ
-            if(Probability(percent))
-            {
-                SetState(MobState.Freeze);
-                _atCount = 1;
-            }
-            else
-            {
-                SetState(MobState.Chase);
-                _atCount++;
-            }
-        }
+        //    //òAë±çUåÇÇÃï™äÚ
+        //    if(Probability(percent))
+        //    {
+        //        _animator.SetBool("IsAttack", false);
+        //        SetState(MobState.Freeze);
+        //        _atCount = 1;
+        //    }
+        //    else
+        //    {
+        //        SetState(MobState.Chase);
+        //        _atCount++;
+        //    }
+        //}
     }
 
     public bool Probability(float percent)

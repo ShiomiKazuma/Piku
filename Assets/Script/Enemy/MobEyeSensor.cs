@@ -16,7 +16,7 @@ public class MobEyeSensor : MonoBehaviour
        // mob = transform.parent.GetComponent<MobController>();
        mob = GetComponent<MobController>();
     }
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if(other.gameObject.tag == "Player")
         {
@@ -27,11 +27,11 @@ public class MobEyeSensor : MonoBehaviour
             if(angle <= _serchAngle)
             {
                 _control.transform.position = Vector3.Lerp(_control.transform.position, other.gameObject.transform.position, 0.1f);
-                if(dis <= _serchArea.radius * 0.15f && dis >= _serchArea.radius * 0f)
+                if(dis <= 2f && dis >= _serchArea.radius * 0f)
                 {
-
+                    mob.SetState(MobController.MobState.Slashattack);
                 }
-                else if(dis <= _serchArea.radius * 0.8f && dis >= _serchArea.radius * 0.15f)
+                else if(dis <= _serchArea.radius * 0.8f && dis >= 2f)
                 {
                     mob.SetState(MobController.MobState.Chase, other.gameObject.transform);
                 }
@@ -46,7 +46,6 @@ public class MobEyeSensor : MonoBehaviour
             {
                 _control.transform.position = Vector3.Lerp(_control.transform.position, transform.position, 0.1f);
                 mob.SetState(MobController.MobState.Idle);
-                Debug.Log("ŽË’öŠO");
             }
         }
     }
