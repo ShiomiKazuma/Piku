@@ -5,7 +5,7 @@ using UnityEngine;
 public class PikiminCall : MonoBehaviour
 {
     [SerializeField, Header("“J‚Ì”¼Œa")] float _radius = 5.0f;
-
+    [SerializeField] FormationControl _formationController;
     public void Update()
     {
         if(Input.GetKeyDown(KeyCode.E))
@@ -25,7 +25,7 @@ public class PikiminCall : MonoBehaviour
             Pikmin pik = pikg.GetComponent<Pikmin>();
             if (pik != null)
             {
-                Debug.Log("ƒsƒNƒ~ƒ“‚ªŒÄ‚Î‚ê‚½");
+                _formationController.CallPikmin(pik.gameObject);
             }
             
         }

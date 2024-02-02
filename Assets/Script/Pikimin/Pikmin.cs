@@ -7,62 +7,74 @@ public class Pikmin : MonoBehaviour
 {
     [SerializeField] NavMeshAgent _agent;
     [SerializeField] bool IsFollow;
-    public PikminPlayer _controller;
-    public Transform _playerGathPos;
+    //public PikminPlayer _controller;
+    //public Transform _playerGathPos;
     [Header("追跡するもの")] public Transform _targetTransform;
     public Transform _homPos;
-    public ObjController _targetObject;
-    public bool _gohome;
-    public bool IsIdle;
+    public GameObject _playerObject;
     Vector3 _destination;
-
+    PikminState _state;
     public enum PikminState
     {
         Idle,
         Follow,
 
     }
+
+    private void Start()
+    {
+        _state = PikminState.Idle;
+    }
+
     private void Update()
     {
-        if(IsFollow)
+        if(_state == PikminState.Follow)
         {
             //_destination = _playerGathPos.position;
             //_agent.SetDestination(_playerGathPos.position);
+            _agent.isStopped = false;
             SetDestination(_targetTransform.position);
             _agent.SetDestination(GetDestination());
             var dir = (GetDestination() - transform.position).normalized;
             dir.y = 0;
             Quaternion setRotation = Quaternion.LookRotation(dir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, setRotation, 120.0f * 0.1f * Time.deltaTime);
-        }
-
-        if(_gohome)
-        {
-            _agent.SetDestination(_homPos.transform.position);
-            if(Vector3.Distance(transform.position, _homPos.transform.position) <= 0.85f)
+            if(dir == Vector3.zero)
             {
-                IsFollow = false;
-                _gohome = false;
-                IsIdle = false;
+                transform.rotation = Quaternion.identity;
+            }
+            else
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, setRotation, 120.0f * 0.1f * Time.deltaTime);
             }
         }
-
-        if(_targetObject != null)
+        else if(_state == PikminState.Idle)
         {
-            _agent.SetDestination(_targetObject.transform.position);
-            if (Vector3.Distance(transform.position, _targetObject.transform.position) <= 0.75f)
-            {
-                _targetObject.transform.position = transform.position + Vector3.forward * 0.9f;
-                _targetObject.transform.SetParent(transform);
-                Destroy(_targetObject.GetComponent<GameObject>());
-                _gohome = true;
-            }
+            _agent.isStopped = true;
         }
 
-        if(IsIdle)
-        {
-            _agent.Stop();
-        }
+        //if(_gohome)
+        //{
+        //    _agent.SetDestination(_homPos.transform.position);
+        //    if(Vector3.Distance(transform.position, _homPos.transform.position) <= 0.85f)
+        //    {
+        //        IsFollow = false;
+        //        _gohome = false;
+        //        IsIdle = false;
+        //    }
+        //}
+
+        //if(_targetObject != null)
+        //{
+        //    _agent.SetDestination(_targetObject.transform.position);
+        //    if (Vector3.Distance(transform.position, _targetObject.transform.position) <= 0.75f)
+        //    {
+        //        _targetObject.transform.position = transform.position + Vector3.forward * 0.9f;
+        //        _targetObject.transform.SetParent(transform);
+        //        Destroy(_targetObject.GetComponent<GameObject>());
+        //        _gohome = true;
+        //    }
+        //}
+
     }
 
     ///<summary>目的地を設定するメソッド</summary>
@@ -76,4 +88,31 @@ public class Pikmin : MonoBehaviour
     {
         return _destination;
     }
+
+    ///<summary>目的地を設定するメソッド</summary>
+    public void SetPikminState(PikminState state)
+    {
+        _state = state;
+    }
+
+    ///<summary>状態を取得するメソッド</summary>
+    public PikminState GetPikminState()
+    {
+        return _state;
+    }
+    //ピクミンが呼ばれた時
+    //public void CallPikmin()
+    //{
+    //    //隊列に入れる
+    //    this.transform.SetParent(_formationParent.transform);
+    //    _pikminList.Add(this.gameObject);
+    //    if (_pikminList.IndexOf(this.gameObject) == 0)
+    //    {
+    //        _targetTransform = _playerObject.transform;
+    //    }
+    //    else
+    //    {
+    //        _targetTransform = _pikminList[_pikminList.IndexOf(this.gameObject) - 1].transform;
+    //    }
+    //}
 }
