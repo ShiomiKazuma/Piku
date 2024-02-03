@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class MobController : MonoBehaviour
 {
@@ -26,16 +28,21 @@ public class MobController : MonoBehaviour
     [SerializeField] Animator _animator;
     [SerializeField] float _freezeTime = 3f;
     float _freezeTimer = 0;
-     
+    [SerializeField] float _maxHp;
+    [SerializeField] Image _image;
+    float _currentHp;
+
     private void Start()
     {
         _navAgent = GetComponent<NavMeshAgent>();
         SetState(MobState.Idle);
+        _currentHp = _maxHp;
     }
 
     private void Update()
     {
-        if(_mobState == MobState.Chase)
+        Gaze();
+        if (_mobState == MobState.Chase)
         {
             if(_targetTransform == null)
             {
@@ -104,8 +111,8 @@ public class MobController : MonoBehaviour
     public int _atCount = 1;
     public void AttackStop()
     {
-        _animator.SetBool("IsAttack", false);
         _mobState = MobState.Freeze;
+        _animator.SetBool("IsAttack", false);
         //_attack = false;
         //if (GetState() == MobState.Freeze) 
         //    SetState(MobState.Chase);
@@ -160,4 +167,30 @@ public class MobController : MonoBehaviour
             return false;
     }
 
+    public void Damage(int damage)
+    {
+        _currentHp -= damage;
+        _image.DOFillAmount(_currentHp / _maxHp, 1.0f);
+    }
+
+    void Gaze()
+    {
+        // Fill Amount‚É‚æ‚Á‚ÄƒQ[ƒW‚ÌF‚ð•Ï‚¦‚é
+        if (_image.fillAmount > 0.5f)
+        {
+
+            _image.color = Color.green;
+ 
+        }
+        else if (_image.fillAmount > 0.2f)
+        {
+
+            _image.color = Color.yellow;
+ 
+        }
+        else 
+        {
+            _image.color = Color.red;
+        }
+    }
 }
