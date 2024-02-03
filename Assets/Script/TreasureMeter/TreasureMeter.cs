@@ -31,6 +31,11 @@ public class TreasureMeter : MonoBehaviour
     {
         float totalAngleSize = _zeroMeterAngle - _maxMeterAngle;
         NearObjectWithTag(_treasureTagName);
+        //ƒ^ƒJƒ‰‚ª‚È‚¢‚È‚ç
+        if(!_treasure)
+        {
+            return _zeroMeterAngle;
+        }
         _currentDistance = Vector3.Distance(_player.transform.position, _treasure.transform.position);
         if (_currentDistance > _maxDis)
             return _zeroMeterAngle;
