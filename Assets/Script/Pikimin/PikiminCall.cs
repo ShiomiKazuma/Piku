@@ -6,12 +6,19 @@ public class PikiminCall : MonoBehaviour
 {
     [SerializeField, Header("笛の半径")] float _radius = 5.0f;
     [SerializeField] FormationControl _formationController;
+    [SerializeField] ParticleSystem _particleSystem;
     public void Update()
     {
         if(Input.GetKeyDown(KeyCode.E))
         {
             Debug.Log("よんでいる");
             CallPikmin();
+            //パーティクルをよぶ
+            _particleSystem.Play();
+        }
+        else if(Input.GetKeyUp(KeyCode.E))
+        {
+            _particleSystem.Stop();
         }
     }
     public void CallPikmin()

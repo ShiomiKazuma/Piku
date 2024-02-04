@@ -9,6 +9,7 @@ public class ObjectController : MonoBehaviour
     [SerializeField] float _objBasicSpeed = 1.0f;
     [SerializeField, Header("オブジェクトのサイズ")] float _objSize;
     [SerializeField, Header("目的地")] GameObject _destination;
+    int _currentPikmin = 0;
     NavMeshAgent _agent;
     ObjState _state;
     float _objSpeed;
@@ -22,6 +23,7 @@ public class ObjectController : MonoBehaviour
     {
         _state = ObjState.Idle;
         _agent = GetComponent<NavMeshAgent>();
+        _agent.destination = _destination.transform.position;
     }
     void Update()
     {
@@ -31,9 +33,7 @@ public class ObjectController : MonoBehaviour
             Finish();
             return;
         }
-        //自身の子オブジェクトを数える
-        int childCount = this.gameObject.transform.childCount;
-        if(childCount >= _pikminCount)
+        if(_currentPikmin >= _pikminCount)
         {
             _state = ObjState.Carry;
         }
@@ -49,7 +49,7 @@ public class ObjectController : MonoBehaviour
         else if(_state == ObjState.Carry)
         {
             _agent.isStopped = false;
-            if(childCount >= _pikminCount)
+            if(_currentPikmin >= _pikminCount)
             {
                 _agent.speed = _objSpeed * 1.5f;
             }
@@ -60,16 +60,19 @@ public class ObjectController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider collider)
-    {
-        if(collider.gameObject.tag == "Pikmin")
-        {
-            //ピクミンが子オブジェクトになる
-        }
-    }
 
     private void Finish()
     {
         Debug.Log("到着しました");
+    }
+
+    public void AddPikmin()
+    {
+        _currentPikmin++;
+    }
+
+    public void DisPikmin()
+    {
+        _currentPikmin--;
     }
 }

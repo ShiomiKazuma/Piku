@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -14,11 +15,13 @@ public class Pikmin : MonoBehaviour
     public GameObject _playerObject;
     Vector3 _destination;
     PikminState _state;
+    Rigidbody _rb;
     public enum PikminState
     {
         Idle,
         Follow,
-
+        Carry,
+        Jump
     }
 
     private void Start()
@@ -51,30 +54,7 @@ public class Pikmin : MonoBehaviour
         {
             _agent.isStopped = true;
         }
-
-        //if(_gohome)
-        //{
-        //    _agent.SetDestination(_homPos.transform.position);
-        //    if(Vector3.Distance(transform.position, _homPos.transform.position) <= 0.85f)
-        //    {
-        //        IsFollow = false;
-        //        _gohome = false;
-        //        IsIdle = false;
-        //    }
-        //}
-
-        //if(_targetObject != null)
-        //{
-        //    _agent.SetDestination(_targetObject.transform.position);
-        //    if (Vector3.Distance(transform.position, _targetObject.transform.position) <= 0.75f)
-        //    {
-        //        _targetObject.transform.position = transform.position + Vector3.forward * 0.9f;
-        //        _targetObject.transform.SetParent(transform);
-        //        Destroy(_targetObject.GetComponent<GameObject>());
-        //        _gohome = true;
-        //    }
-        //}
-
+        
     }
 
     ///<summary>目的地を設定するメソッド</summary>
@@ -100,19 +80,20 @@ public class Pikmin : MonoBehaviour
     {
         return _state;
     }
-    //ピクミンが呼ばれた時
-    //public void CallPikmin()
-    //{
-    //    //隊列に入れる
-    //    this.transform.SetParent(_formationParent.transform);
-    //    _pikminList.Add(this.gameObject);
-    //    if (_pikminList.IndexOf(this.gameObject) == 0)
-    //    {
-    //        _targetTransform = _playerObject.transform;
-    //    }
-    //    else
-    //    {
-    //        _targetTransform = _pikminList[_pikminList.IndexOf(this.gameObject) - 1].transform;
-    //    }
-    //}
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(_state == PikminState.Jump)
+        {
+            //色を変える
+            _state = PikminState.Idle;
+            if(collision.gameObject.tag == "Enemy")
+            {
+                //エネミーに攻撃する
+
+                //ノックバックさせる
+                Vector3 normal = collision.contacts[0].normal;
+            }
+        }
+    }
 }
