@@ -11,11 +11,15 @@ public class Pikmin : MonoBehaviour
     //public PikminPlayer _controller;
     //public Transform _playerGathPos;
     [Header("追跡するもの")] public Transform _targetTransform;
-    public Transform _homPos;
+    public GameObject _target;
+    GameObject _parentObj;
     public GameObject _playerObject;
     Vector3 _destination;
-    PikminState _state;
+    public PikminState _state = PikminState.Idle;
     Rigidbody _rb;
+    float _stopDis;
+    public bool IsFirstCarry = false;
+    public bool IsChild = false;
     public enum PikminState
     {
         Idle,
@@ -26,15 +30,18 @@ public class Pikmin : MonoBehaviour
 
     private void Start()
     {
-        _state = PikminState.Idle;
+        _stopDis = _agent.stoppingDistance;
     }
-
     private void Update()
     {
+        if (_state == PikminState.Jump)
+            return;
         if(_state == PikminState.Follow)
         {
             //_destination = _playerGathPos.position;
             //_agent.SetDestination(_playerGathPos.position);
+            _agent.enabled = true;
+            _agent.stoppingDistance = _stopDis;
             _agent.isStopped = false;
             SetDestination(_targetTransform.position);
             _agent.SetDestination(GetDestination());
@@ -52,9 +59,22 @@ public class Pikmin : MonoBehaviour
         }
         else if(_state == PikminState.Idle)
         {
+            _agent.enabled = true;
             _agent.isStopped = true;
         }
-        
+        else if(_state == PikminState.Carry)
+        {
+            if(_agent.stoppingDistance > Vector3.Distance(_target.transform.position, this.transform.position) && !IsFirstCarry)
+            {
+                _agent.isStopped = false;
+                _agent.enabled = false;
+                this.gameObject.transform.parent = _parentObj.transform;
+                var parent = _parentObj.GetComponent<ObjectController>();
+                IsFirstCarry = true;
+                IsChild = true;
+                parent.AddPikmin();
+            }
+        }
     }
 
     ///<summary>目的地を設定するメソッド</summary>
@@ -81,19 +101,34 @@ public class Pikmin : MonoBehaviour
         return _state;
     }
 
+    ///<summary>状態を取得するメソッド</summary>
+    public void PikminJump()
+    {
+        _state = PikminState.Jump;
+    }
+
+    public void SetCarry(GameObject target, GameObject parent)
+    {
+        _state = PikminState.Carry;
+        _agent.enabled = true;
+        _agent.isStopped = false;
+        SetDestination(target.transform.position);
+        _agent.SetDestination(GetDestination());
+        _target = target;
+        _parentObj = parent;
+        _agent.stoppingDistance = 1f;
+    }
     private void OnCollisionEnter(Collision collision)
     {
         if(_state == PikminState.Jump)
         {
-            //色を変える
+            _agent.enabled = true;
             _state = PikminState.Idle;
             if(collision.gameObject.tag == "Enemy")
             {
-                //エネミーに攻撃する
-
-                //ノックバックさせる
-                Vector3 normal = collision.contacts[0].normal;
+                
             }
         }
     }
+
 }

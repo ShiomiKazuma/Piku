@@ -17,14 +17,14 @@ public class CursorManager : MonoBehaviour
         //カメラからマウスがある場所に向かってRayを発射
         RaycastHit hit;
         //layer8と9の"Player"と"Attack"には当たらないためのマスク
-        int layerMask = ~(1 << 8 | 1 << 9);
+        int layerMask = ~(1 << 8 | 1 << 9 | 1 << 7 | 1 << 6);
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
         {
             //当たった箇所の座標
             //transform.position = hit.point;
             //プレイヤーの高さに合わせる
-            Vector3 vec = new Vector3(hit.point.x, (_player.transform.position.y) - 0.5f, hit.point.z);
+            Vector3 vec = new Vector3(hit.point.x, (_player.transform.position.y), hit.point.z);
             float dis = Vector3.Distance(vec, _player.transform.position);
             if (dis <= _maxDis && dis >= _minDis)
             {
