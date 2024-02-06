@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class FormationControl : MonoBehaviour
@@ -34,6 +35,26 @@ public class FormationControl : MonoBehaviour
         {
             GameObject child = _parent.transform.GetChild(i).gameObject;
             Destroy(child);
+        }
+    }
+
+    public void TrowPik()
+    {
+        Destroy(_tokenList[0]);
+        _tokenList.RemoveAt(0);
+        if(_tokenList.Count != 0)
+        {
+            foreach(GameObject p in _tokenList)
+            {
+                if (_tokenList.IndexOf(p) == 0)
+                {
+                    p.GetComponent<Pikmin>()._targetTransform = this._targetTransform;
+                }
+                else
+                {
+                    p.GetComponent<Pikmin>()._targetTransform = _tokenList[_tokenList.IndexOf(p) - 1].transform;
+                }
+            }
         }
     }
 }

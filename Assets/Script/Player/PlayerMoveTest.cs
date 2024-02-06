@@ -115,4 +115,11 @@ public class PlayerMoveTest : MonoBehaviour
     {
         return Vector3.ProjectOnPlane(_dir, _slopeHit.normal).normalized;
     }
+
+    public void PlayerDamage(int damage)
+    {
+        GameManager._instance.Damage(damage);
+        _animator.SetTrigger("Damage");
+        SoundManager._instance.PlaySE(SESoundData.SE.Damage);
+    }
 }

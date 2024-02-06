@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,6 +19,9 @@ public class Pikmin : MonoBehaviour
     float _stopDis;
     public bool IsFirstCarry = false;
     public bool IsChild = false;
+    [SerializeField] ParticleSystem _particleSystem;
+    TrailRenderer _trailRenderer;
+    [SerializeField] ParticleSystem _deathEffect;
     public enum PikminState
     {
         Idle,
@@ -31,11 +33,17 @@ public class Pikmin : MonoBehaviour
     private void Start()
     {
         _stopDis = _agent.stoppingDistance;
+        _trailRenderer = GetComponent<TrailRenderer>();
+        _trailRenderer.enabled = false;
     }
     private void Update()
     {
         if (_state == PikminState.Jump)
+        {
+            _trailRenderer.enabled = true;
             return;
+        }
+            
         if(_state == PikminState.Follow)
         {
             //_destination = _playerGathPos.position;
@@ -122,13 +130,24 @@ public class Pikmin : MonoBehaviour
     {
         if(_state == PikminState.Jump)
         {
+            _trailRenderer.enabled = false;
             _agent.enabled = true;
             _state = PikminState.Idle;
             if(collision.gameObject.tag == "Enemy")
             {
-                
+                SoundManager._instance.PlaySE(SESoundData.SE.SlimeDamage);
+                var en = collision.transform.root.gameObject.GetComponent<MobController>();
+                en.Damage(1);
+                Instantiate(_particleSystem, transform.position, Quaternion.identity);
             }
         }
+    }
+
+    public void Death()
+    {
+        Instantiate(_deathEffect, transform.position, Quaternion.identity);
+        SoundManager._instance.PlaySE(SESoundData.SE.SlimeDeath);
+        Destroy(this.gameObject);
     }
 
 }

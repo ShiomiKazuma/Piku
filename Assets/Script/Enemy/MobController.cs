@@ -31,7 +31,8 @@ public class MobController : MonoBehaviour
     [SerializeField] float _maxHp;
     [SerializeField] Image _image;
     float _currentHp;
-
+    [SerializeField] GameObject _damageObj;
+    bool IsDeath = true;
     private void Start()
     {
         _navAgent = GetComponent<NavMeshAgent>();
@@ -41,6 +42,12 @@ public class MobController : MonoBehaviour
 
     private void Update()
     {
+        if(_currentHp <= 0 && IsDeath)
+        {
+            Death();
+            IsDeath = false;
+            return;
+        }
         Gaze();
         if (_mobState == MobState.Chase)
         {
@@ -74,7 +81,7 @@ public class MobController : MonoBehaviour
                 _mobState = MobState.Idle;
             }
         }
-        Debug.Log(_freezeTimer);
+        //Debug.Log(_freezeTimer);
     }
     public void SetState(MobState tempState, Transform targetObject = null)
     {
@@ -113,47 +120,6 @@ public class MobController : MonoBehaviour
     {
         _mobState = MobState.Freeze;
         _animator.SetBool("IsAttack", false);
-        //_attack = false;
-        //if (GetState() == MobState.Freeze) 
-        //    SetState(MobState.Chase);
-        //else
-        //{
-        //    float percent = 0.0f;
-
-        //    switch(_tactic)//˜A‘±UŒ‚‚Ì—”
-        //    {
-        //        case 1:
-        //            percent = 100.0f;
-        //            break;
-        //        case 2:
-        //            if (_atCount == 1)
-        //                percent = 50.0f;
-        //            else if (_atCount == 2)
-        //                percent = 100.0f;
-        //            break;
-        //        case 3:
-        //            if (_atCount == 1)
-        //                percent = 30.0f;
-        //            else if (_atCount == 2)
-        //                percent = 70.0f;
-        //            else if (_atCount == 3)
-        //                percent = 100.0f;
-        //            break;
-        //    }
-
-        //    //˜A‘±UŒ‚‚Ì•ªŠò
-        //    if(Probability(percent))
-        //    {
-        //        _animator.SetBool("IsAttack", false);
-        //        SetState(MobState.Freeze);
-        //        _atCount = 1;
-        //    }
-        //    else
-        //    {
-        //        SetState(MobState.Chase);
-        //        _atCount++;
-        //    }
-        //}
     }
 
     public bool Probability(float percent)
@@ -192,5 +158,12 @@ public class MobController : MonoBehaviour
         {
             _image.color = Color.red;
         }
+    }
+
+    public void Death()
+    {
+        var dag = _damageObj.GetComponent<Damage>();
+        _animator.SetTrigger("Death");
+        dag.Death();
     }
 }

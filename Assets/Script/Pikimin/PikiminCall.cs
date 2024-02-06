@@ -32,13 +32,14 @@ public class PikiminCall : MonoBehaviour
     public void CallPikmin()
     {
         //RaycastHit[] hits = Physics.SphereCastAll(this.transform.position, _radius);
+        SoundManager._instance.PlaySE(SESoundData.SE.Call);
         var pikmin = Physics.OverlapSphere(this.transform.position, _radius);
         foreach(var p in pikmin)
         {
             var pikg = p.gameObject;
             //ƒsƒNƒ~ƒ“‚È‚ç‘à—ñ‚É‰Á‚í‚é
             Pikmin pik = pikg.GetComponent<Pikmin>();
-            if (pik != null && pik._state != Pikmin.PikminState.Jump)
+            if (pik != null && pik._state != Pikmin.PikminState.Jump && pik._state != Pikmin.PikminState.Follow)
             {
                 if(pik._state == Pikmin.PikminState.Carry)
                 {
